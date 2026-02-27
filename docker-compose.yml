@@ -1,0 +1,21 @@
+services:
+  logic:
+    build: ./logic
+    container_name: deeppool-logic
+    volumes:
+      - /sys:/sys:ro
+      - /etc/localtime:/etc/localtime:ro  # Synchronise l'heure
+      - /etc/timezone:/etc/timezone:ro      # Synchronise le fuseau
+    restart: unless-stopped
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  # # Le gardien des mises à jour (Fork maintenu par Nick Fedor)
+  # watchtower:
+  #   image: nickfedor/watchtower:latest
+  #   container_name: deeppool-watchtower
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   # Vérification toutes les 24h et nettoyage des anciennes images
+  #   command: --interval 86400 --cleanup
+  #   restart: always
