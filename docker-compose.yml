@@ -1,21 +1,47 @@
 services:
+  # --- LE CERVEAU ---
   logic:
     build: ./logic
     container_name: deeppool-logic
     volumes:
       - /sys:/sys:ro
-      - /etc/localtime:/etc/localtime:ro  # Synchronise l'heure
-      - /etc/timezone:/etc/timezone:ro      # Synchronise le fuseau
-    restart: unless-stopped
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     environment:
       - PYTHONUNBUFFERED=1
+      - TZ=Europe/Paris
+    restart: unless-stopped
+    depends_on:
+      - influxdb
 
-  # # Le gardien des mises à jour (Fork maintenu par Nick Fedor)
-  # watchtower:
-  #   image: nickfedor/watchtower:latest
-  #   container_name: deeppool-watchtower
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #   # Vérification toutes les 24h et nettoyage des anciennes images
-  #   command: --interval 86400 --cleanup
-  #   restart: always
+  # --- LA BASE DE DONNÉES ---
+  influxdb:
+    image: influxdb:1.8
+    container_name: deeppool-influxdb
+    volumes:
+      - ./influxdb_data:/var/lib/influxdb
+    environment:
+      - INFLUXDB_DB=deeppool
+    restart: always
+
+  # --- L'INTERFACE GRAPHIQUE ---
+  grafana:
+    image: grafana/grafana-oss:latest
+    container_name: deeppool-grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana_data:/var/lib/grafana
+    environment:
+      - TZ=Europe/Paris
+      - GF_SERVER_ENABLE_GZIP=true
+    restart: always
+
+  # --- MISES À JOUR ---
+  watchtower:
+    image: nickfedor/watchtower:latest
+    container_name: deeppool-watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 86400 --cleanup
+    restart: always

@@ -26,3 +26,11 @@ MANIFEST
 
 # Environments
 .env
+
+#InfluxDb files
+
+influxdb_data/
+
+#Grafana files
+
+grafana_data/

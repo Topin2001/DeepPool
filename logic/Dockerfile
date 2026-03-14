@@ -3,6 +3,9 @@ FROM python:3.13-slim
 # Définit le dossier de travail
 WORKDIR /app
 
+# Ajout de la dépendance
+RUN pip install influxdb
+
 # Copie le script dans le conteneur
 COPY main.py .
 
