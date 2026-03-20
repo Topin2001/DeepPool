@@ -35,6 +35,8 @@ services:
     environment:
       - TZ=Europe/Paris
       - GF_SERVER_ENABLE_GZIP=true
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
     restart: always
 
   # --- MISES À JOUR ---
