@@ -1,7 +1,7 @@
 services:
   # --- LE CERVEAU ---
   logic:
-    build: ./logic
+    image: ghcr.io/topin2001/deeppool/deeppool-logic:latest
     container_name: deeppool-logic
     volumes:
       - /sys:/sys:ro
@@ -43,5 +43,5 @@ services:
     container_name: deeppool-watchtower
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    command: --interval 86400 --cleanup
+    command: --interval 300 --cleanup
     restart: always
