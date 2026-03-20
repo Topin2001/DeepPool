@@ -1,9 +1,9 @@
-name: Build and Push to GHCR
+name: Build and Push DeepPool Logic
 
 on:
   push:
     branches: [ "main" ]
-    tags: [ 'v*.*.*' ]
+  workflow_dispatch: # Permet de lancer le build manuellement si besoin
 
 jobs:
   build:
@@ -16,23 +16,34 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Étape CRUCIALE : Convertit "Topin2001/DeepPool" en "topin2001/deeppool"
+      - name: Lowercase repo name
+        run: |
+          echo "REPO_LC=${GITHUB_REPOSITORY,,}" >> ${GITHUB_ENV}
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Log into registry ghcr.io
+      - name: Log into GitHub Container Registry (GHCR)
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push
+      - name: Build and push logic image
         uses: docker/build-push-action@v5
         with:
           context: ./logic
+          # On cible l'architecture du Pi 3B+
           platforms: linux/arm/v7
           push: true
-          tags: ghcr.io/${{ github.repository }}/deeppool-logic:latest
+          # On utilise la variable en minuscules ici
+          tags: |
+            ghcr.io/${{ env.REPO_LC }}/deeppool-logic:latest
+          # Optimisation pour la vitesse des builds suivants
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
