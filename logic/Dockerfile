@@ -1,15 +1,20 @@
 FROM python:3.13-slim
 
-# Définit le dossier de travail
+# On installe gcc (nécessaire pour compiler influxdb sur ARM/v7)
+RUN apt-get update && apt-get install -y \
+    gcc \
+    python3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
-# Ajout de la dépendance
-RUN pip install influxdb
+# Installation de la dépendance
+RUN pip install --no-cache-dir influxdb
 
 # Copie le script dans le conteneur
 COPY main.py .
 
-# Désactive le buffering de Python pour voir les "print" en temps réel dans Docker
+# Désactive le buffering pour voir les logs
 ENV PYTHONUNBUFFERED=1
 
 CMD ["python", "main.py"]
