@@ -40,10 +40,11 @@ while True:
     try:
         client.create_database(DB_NAME)
         client.switch_database(DB_NAME)
+        print("[INFO] InfluxDB connected.")
         break
     except Exception as e:
         print(f"[INFO] Waiting for InfluxDB... ({e})")
-        time.sleep(5)
+        time.sleep(10)
 
 print("🚀 DeepPool starting...")
 
@@ -53,7 +54,7 @@ try:
     while True:
         temp = read_temp()
         if temp is not None:
-            now = datetime.datetime.utcnow()
+            now = datetime.datetime.now(datetime.UTC)
 
             # Hysteresis: only change state when crossing the thresholds
             if not pump_active and temp >= TEMP_ON:
