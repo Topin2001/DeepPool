@@ -3,6 +3,9 @@ services:
   logic:
     image: ghcr.io/topin2001/deeppool/deeppool-logic:latest
     container_name: deeppool-logic
+    privileged: true                          # allows GPIO access
+    devices:
+      - /dev/gpiomem:/dev/gpiomem             # GPIO
     volumes:
       - /sys:/sys:ro
       - /etc/localtime:/etc/localtime:ro
