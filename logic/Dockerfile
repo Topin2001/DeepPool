@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Installation de la dépendance
-RUN pip install --no-cache-dir influxdb RPi.GPIO
+RUN pip install --no-cache-dir influxdb==5.3.1 RPi.GPIO
 
 # Copie le script dans le conteneur
 COPY main.py .
