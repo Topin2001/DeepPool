@@ -1,7 +1,6 @@
 import time
 import glob
 import sys
-import datetime
 import RPi.GPIO as GPIO
 from influxdb import InfluxDBClient
 
@@ -53,9 +52,6 @@ try:
     while True:
         temp = read_temp()
         if temp is not None:
-            now = datetime.datetime.now(datetime.timezone.utc)
-            now_str = now.strftime('%Y-%m-%dT%H:%M:%S.%f') + 'Z'
-
             if not pump_active and temp >= TEMP_ON:
                 pump_active = True
                 set_pump(True)
@@ -66,19 +62,14 @@ try:
             client.write_points([
                 {
                     "measurement": "temperature_eau",
-                    "time": now_str,
                     "fields": {"value": temp}
                 },
                 {
                     "measurement": "etat_pompe",
-                    "time": now_str,
-                    "fields": {
-                        "active": pump_active,
-                        "value": int(pump_active)
-                    }
+                    "fields": {"value": int(pump_active)}
                 }
             ])
-            print(f"[{now.strftime('%H:%M:%S')}] {temp:.1f}°C — pompe {'ON' if pump_active else 'OFF'}")
+            print(f"[{time.strftime('%H:%M:%S')}] {temp:.1f}°C — pompe {'ON' if pump_active else 'OFF'}")
 
         sys.stdout.flush()
         time.sleep(60)
