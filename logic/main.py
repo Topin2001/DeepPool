@@ -18,6 +18,14 @@ def read_temp():
     except:
         return None
 
+def gestion_pompe(temp):
+    if temp >= 28.0:
+        print("⚠️ Température élevée! Activation de la pompe.")
+        # Code pour activer la pompe (GPIO ou autre)
+    elif temp <= 25.0:
+        print("✅ Température normale. Pompe désactivée.")
+        # Code pour désactiver la pompe (GPIO ou autre)
+
 # Attente que la DB soit prête
 while True:
     try:
@@ -41,6 +49,7 @@ while True:
         ]
         client.write_points(json_body)
         print(f"[{time.strftime('%H:%M:%S')}] {temp}°C sauvegardé.")
+        gestion_pompe(temp)
     
     sys.stdout.flush()
     time.sleep(60) # On enregistre toutes les minutes
