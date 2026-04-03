@@ -7,8 +7,8 @@ from influxdb import InfluxDBClient
 
 # --- Configuration ---
 GPIO_PIN = 17
-TEMP_ON  = 28.0   # activate pump (and LED) above this
-TEMP_OFF = 25.0   # deactivate below this
+TEMP_ON  = 28.0
+TEMP_OFF = 25.0
 DB_NAME  = "deeppool"
 
 # --- GPIO setup ---
@@ -32,8 +32,7 @@ def read_temp():
 
 def set_pump(active: bool):
     GPIO.output(GPIO_PIN, GPIO.HIGH if active else GPIO.LOW)
-    state = "ON" if active else "OFF"
-    print(f"[PUMP] {state}")
+    print(f"[PUMP] {'ON' if active else 'OFF'}")
 
 # Wait for InfluxDB
 while True:
@@ -54,9 +53,9 @@ try:
     while True:
         temp = read_temp()
         if temp is not None:
-            now = datetime.datetime.now(datetime.UTC)
+            now = datetime.datetime.now(datetime.timezone.utc)
+            now_str = now.strftime('%Y-%m-%dT%H:%M:%S.%f') + 'Z'
 
-            # Hysteresis: only change state when crossing the thresholds
             if not pump_active and temp >= TEMP_ON:
                 pump_active = True
                 set_pump(True)
@@ -67,12 +66,12 @@ try:
             client.write_points([
                 {
                     "measurement": "temperature_eau",
-                    "time": now.isoformat() + "Z",
+                    "time": now_str,
                     "fields": {"value": temp}
                 },
                 {
                     "measurement": "etat_pompe",
-                    "time": now.isoformat() + "Z",
+                    "time": now_str,
                     "fields": {
                         "active": pump_active,
                         "value": int(pump_active)
