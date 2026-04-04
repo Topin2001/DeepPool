@@ -1,9 +1,18 @@
 import time
 import sys
+import signal
 import temp_sensor
 import pump_control
 import db_client
 import controller
+
+def handle_shutdown(signum, frame):
+    print("\n[INFO] Shutting down...")
+    pump_control.cleanup()
+    sys.exit(0)
+
+signal.signal(signal.SIGTERM, handle_shutdown)
+signal.signal(signal.SIGINT, handle_shutdown)
 
 # --- Setup ---
 pump_control.setup()
@@ -25,6 +34,6 @@ try:
         time.sleep(60)
 
 except KeyboardInterrupt:
-    print("\n[INFO] Shutting down...")
+    pass
 finally:
     pump_control.cleanup()
