@@ -3,9 +3,9 @@ services:
   logic:
     image: ghcr.io/topin2001/deeppool/deeppool-logic:latest
     container_name: deeppool-logic
-    privileged: true                          # allows GPIO access
+    privileged: true
     devices:
-      - /dev/gpiomem:/dev/gpiomem             # GPIO
+      - /dev/gpiomem:/dev/gpiomem
     volumes:
       - /sys:/sys:ro
       - /etc/localtime:/etc/localtime:ro
@@ -13,18 +13,29 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - TZ=Europe/Paris
+      - INFLUXDB_URL=http://influxdb:8086
+      - INFLUXDB_TOKEN=${INFLUXDB_ADMIN_TOKEN}
+      - INFLUXDB_ORG=${INFLUXDB_ORG}
+      - INFLUXDB_BUCKET=${INFLUXDB_BUCKET}
     restart: unless-stopped
     depends_on:
       - influxdb
 
   # --- LA BASE DE DONNÉES ---
   influxdb:
-    image: influxdb:1.8
+    image: influxdb:latest
     container_name: deeppool-influxdb
+    ports:
+      - "8086:8086"
     volumes:
-      - ./influxdb_data:/var/lib/influxdb
+      - ./influxdb_data:/var/lib/influxdb2
     environment:
-      - INFLUXDB_DB=deeppool
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=${INFLUXDB_ADMIN_USER}
+      - DOCKER_INFLUXDB_INIT_PASSWORD=${INFLUXDB_ADMIN_PASSWORD}
+      - DOCKER_INFLUXDB_INIT_ORG=${INFLUXDB_ORG}
+      - DOCKER_INFLUXDB_INIT_BUCKET=${INFLUXDB_BUCKET}
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${INFLUXDB_ADMIN_TOKEN}
     restart: always
 
   # --- L'INTERFACE GRAPHIQUE ---
