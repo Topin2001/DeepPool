@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-RUN pip install --no-cache-dir influxdb-client RPi.GPIO
+RUN pip install --no-cache-dir influxdb-client==1.45.0 RPi.GPIO
 
 COPY *.py .
 
