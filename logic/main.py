@@ -5,6 +5,7 @@ import temp_sensor
 import pump_control
 import db_client
 import controller
+import switch_reader
 
 def handle_shutdown(signum, frame):
     print("\n[INFO] Shutting down...")
@@ -26,10 +27,13 @@ try:
         temp = temp_sensor.read_temp()
 
         if temp is not None:
-            pump_state = controller.resolve_pump_state(temp=temp)
+            manual = switch_reader.read_manual()
+            pump_state = controller.resolve_pump_state(temp=temp, manual_request=manual)
             pump_control.set_pump(pump_state)
             db_client.write(temp, pump_state)
-            print(f"[{time.strftime('%H:%M:%S')}] {temp:.1f}°C — pompe {'ON' if pump_state else 'OFF'}")
+            
+            mode = "manuel ON" if manual is True else "manuel OFF" if manual is False else "auto"
+            print(f"[{time.strftime('%H:%M:%S')}] {temp:.1f}°C — pompe {'ON' if pump_state else 'OFF'} ({mode})")
 
         sys.stdout.flush()
         time.sleep(60)
