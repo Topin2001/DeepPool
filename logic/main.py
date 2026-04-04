@@ -9,6 +9,7 @@ import controller
 def handle_shutdown(signum, frame):
     print("\n[INFO] Shutting down...")
     pump_control.cleanup()
+    db_client.close()
     sys.exit(0)
 
 signal.signal(signal.SIGTERM, handle_shutdown)
@@ -37,3 +38,4 @@ except KeyboardInterrupt:
     pass
 finally:
     pump_control.cleanup()
+    db_client.close()
