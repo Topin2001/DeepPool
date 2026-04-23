@@ -26,6 +26,9 @@ MANIFEST
 
 # Environments
 .env
+.config.json
+.schedule.json
+.override.json
 
 #InfluxDb files
 
