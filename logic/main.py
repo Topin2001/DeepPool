@@ -1,6 +1,7 @@
 import time
 import sys
 import signal
+import config
 import temp_sensor
 import pump_control
 import db_client
@@ -24,6 +25,7 @@ print("🚀 DeepPool starting...")
 
 try:
     while True:
+        cfg = config.load()
         temp = temp_sensor.read_temp()
 
         if temp is not None:
@@ -31,12 +33,12 @@ try:
             pump_state = controller.resolve_pump_state(temp=temp, manual_request=manual)
             pump_control.set_pump(pump_state)
             db_client.write(temp, pump_state)
-            
+
             mode = "manuel ON" if manual is True else "manuel OFF" if manual is False else "auto"
             print(f"[{time.strftime('%H:%M:%S')}] {temp:.1f}°C — pompe {'ON' if pump_state else 'OFF'} ({mode})")
 
         sys.stdout.flush()
-        time.sleep(60)
+        time.sleep(cfg["loop_interval_seconds"])
 
 except KeyboardInterrupt:
     pass

@@ -1,18 +1,17 @@
 import RPi.GPIO as GPIO
-
-GPIO_SW_ON  = 23   # SW1 — Marche forcée
-GPIO_SW_OFF = 24   # SW2 — Arrêt forcé
+import config
 
 def setup():
-    GPIO.setup(GPIO_SW_ON,  GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-    GPIO.setup(GPIO_SW_OFF, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    cfg = config.load()
+    GPIO.setup(cfg["gpio_pin_sw_on"],  GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    GPIO.setup(cfg["gpio_pin_sw_off"], GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
 def read_manual() -> bool | None:
-    sw_on  = GPIO.input(GPIO_SW_ON)
-    sw_off = GPIO.input(GPIO_SW_OFF)
-
+    cfg = config.load()
+    sw_on  = GPIO.input(cfg["gpio_pin_sw_on"])
+    sw_off = GPIO.input(cfg["gpio_pin_sw_off"])
     if sw_on and not sw_off:
-        return True    # marche forcée
+        return True
     if sw_off and not sw_on:
-        return False   # arrêt forcé
-    return None        # auto (les deux OFF, ou les deux ON → ignoré)
+        return False
+    return None

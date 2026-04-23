@@ -10,6 +10,7 @@ services:
       - /sys:/sys:ro
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
+      - ./config.json:/config/config.json
     environment:
       - PYTHONUNBUFFERED=1
       - TZ=Europe/Paris
