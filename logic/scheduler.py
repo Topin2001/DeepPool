@@ -47,9 +47,6 @@ def _slot_is_active(slot: dict, now: time, temp: float) -> bool:
 def schedule_wants_pump(temp: float) -> bool | None:
     schedule = _load()
 
-    if not schedule["enabled"]:
-        return None
-
     now = datetime.now().time()
     for slot in schedule["slots"]:
         if _slot_is_active(slot, now, temp):
