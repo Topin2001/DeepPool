@@ -7,6 +7,8 @@ import pump_control
 import db_client
 import controller
 import switch_reader
+import scheduler
+import override_reader
 
 def handle_shutdown(signum, frame):
     print("\n[INFO] Shutting down...")
@@ -29,12 +31,29 @@ try:
         temp = temp_sensor.read_temp()
 
         if temp is not None:
-            manual = switch_reader.read_manual()
-            pump_state = controller.resolve_pump_state(temp=temp, manual_request=manual)
+            physical  = switch_reader.read_manual()
+            web_over  = override_reader.read_override()
+            scheduled = scheduler.schedule_wants_pump(temp)
+
+            pump_state = controller.resolve_pump_state(
+                temp=temp,
+                physical_request=physical,
+                web_override=web_over,
+                schedule_request=scheduled,
+            )
+
             pump_control.set_pump(pump_state)
             db_client.write(temp, pump_state)
 
-            mode = "manuel ON" if manual is True else "manuel OFF" if manual is False else "auto"
+            if physical is not None:
+                mode = f"physique {'ON' if physical else 'OFF'}"
+            elif web_over is not None:
+                mode = f"override web {'ON' if web_over else 'OFF'}"
+            elif scheduled is not None:
+                mode = "planning"
+            else:
+                mode = "auto temp"
+
             print(f"[{time.strftime('%H:%M:%S')}] {temp:.1f}°C — pompe {'ON' if pump_state else 'OFF'} ({mode})")
 
         sys.stdout.flush()
