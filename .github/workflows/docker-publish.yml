@@ -38,12 +38,18 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./logic
-          # On cible l'architecture du Pi 3B+
           platforms: linux/arm/v7
           push: true
-          # On utilise la variable en minuscules ici
-          tags: |
-            ghcr.io/${{ env.REPO_LC }}/deeppool-logic:latest
-          # Optimisation pour la vitesse des builds suivants
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          tags: ghcr.io/${{ env.REPO_LC }}/deeppool-logic:latest
+          cache-from: type=gha,scope=logic
+          cache-to: type=gha,mode=max,scope=logic
+
+      - name: Build and push api image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./api
+          platforms: linux/arm/v7
+          push: true
+          tags: ghcr.io/${{ env.REPO_LC }}/deeppool-api:latest
+          cache-from: type=gha,scope=api
+          cache-to: type=gha,mode=max,scope=api

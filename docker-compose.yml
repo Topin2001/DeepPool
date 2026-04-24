@@ -56,6 +56,28 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
     restart: always
 
+  # --- API ---
+  api:
+    image: ghcr.io/topin2001/deeppool/deeppool-api:latest
+    container_name: deeppool-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./config.json:/config/config.json
+      - ./schedule.json:/config/schedule.json
+      - ./override.json:/config/override.json
+    environment:
+      - INFLUXDB_URL=http://influxdb:8086
+      - INFLUXDB_TOKEN=${INFLUXDB_ADMIN_TOKEN}
+      - INFLUXDB_ORG=${INFLUXDB_ORG}
+      - INFLUXDB_BUCKET=${INFLUXDB_BUCKET}
+      - API_USERNAME=${API_USERNAME}
+      - API_PASSWORD=${API_PASSWORD}
+      - API_SECRET_KEY=${API_SECRET_KEY}
+    restart: unless-stopped
+    depends_on:
+      - influxdb
+
   # --- MISES À JOUR ---
   watchtower:
     image: nickfedor/watchtower:latest
