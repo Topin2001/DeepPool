@@ -13,7 +13,7 @@ export default function PumpControl() {
     }
   })
 
-  const current = data?.override ?? null  // true | false | null
+  const current = data?.web ?? null  // on lit web, pas state
 
   const buttons = [
     { label: 'Marche forcée', value: true,  color: 'green' },
