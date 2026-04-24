@@ -78,6 +78,16 @@ services:
     depends_on:
       - influxdb
 
+  # --- SITE WEB ---
+  web:
+    image: ghcr.io/topin2001/deeppool/deeppool-web:latest
+    container_name: deeppool-web
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    depends_on:
+      - api
+
   # --- MISES À JOUR ---
   watchtower:
     image: nickfedor/watchtower:latest

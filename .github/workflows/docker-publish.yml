@@ -52,3 +52,13 @@ jobs:
           tags: ghcr.io/${{ env.REPO_LC }}/deeppool-api:latest
           cache-from: type=gha,scope=api
           cache-to: type=gha,mode=max,scope=api
+
+      - name: Build and push web image
+        uses: docker/build-push-action@v7.1.0
+        with:
+          context: ./web
+          platforms: linux/arm/v7
+          push: true
+          tags: ghcr.io/${{ env.REPO_LC }}/deeppool-web:latest
+          cache-from: type=gha,scope=web
+          cache-to: type=gha,mode=max,scope=web
