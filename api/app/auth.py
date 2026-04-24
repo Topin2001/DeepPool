@@ -1,22 +1,14 @@
 import os
 from datetime import datetime, timedelta, timezone
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 
-SECRET_KEY    = os.environ["API_SECRET_KEY"]
-ALGORITHM     = "HS256"
-TOKEN_EXPIRY  = 24  # heures
+SECRET_KEY   = os.environ["API_SECRET_KEY"]
+ALGORITHM    = "HS256"
+TOKEN_EXPIRY = 24  # heures
 
-pwd_context   = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
-
-def verify_password(plain: str, hashed: str) -> bool:
-    return pwd_context.verify(plain, hashed)
-
-def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
 
 def create_token(data: dict) -> str:
     payload = data.copy()

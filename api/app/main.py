@@ -2,7 +2,6 @@ import os
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
-from passlib.context import CryptContext
 from pydantic import BaseModel
 from typing import Optional
 
@@ -20,8 +19,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 # --- Modèles ---
 
 class ConfigUpdate(BaseModel):
@@ -38,10 +35,8 @@ class ScheduleUpdate(BaseModel):
 
 @app.post("/auth/login")
 def login(form: OAuth2PasswordRequestForm = Depends()):
-    expected_user = os.environ["API_USERNAME"]
-    expected_hash = auth.hash_password(os.environ["API_PASSWORD"])
-
-    if form.username != expected_user or not auth.verify_password(form.password, expected_hash):
+    if form.username != os.environ["API_USERNAME"] or \
+       form.password != os.environ["API_PASSWORD"]:
         raise HTTPException(status_code=401, detail="Identifiants incorrects")
 
     token = auth.create_token({"sub": form.username})
