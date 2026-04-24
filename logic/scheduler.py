@@ -18,13 +18,21 @@ def _parse_time(t_str: str) -> time:
     return time(int(h), int(m))
 
 def _slot_is_active(slot: dict, now: datetime, temp: float) -> bool:
+    # Condition d'activation minimale
+    min_temp = slot.get("min_temp", None)
+    if min_temp is not None and temp < min_temp:
+        return False
+
     start_dt = datetime.combine(now.date(), _parse_time(slot["start"]))
     end_dt   = datetime.combine(now.date(), _parse_time(slot["end"]))
 
-    for ext in slot.get("temp_extensions", []):
+    # Extension après la plage — la règle la plus haute gagne
+    extra_after = 0
+    for ext in slot.get("extensions", []):
         if temp >= ext["above"]:
-            start_dt -= timedelta(minutes=ext["extend_minutes"])
-            end_dt   += timedelta(minutes=ext["extend_minutes"])
+            extra_after = max(extra_after, ext.get("extend_after_minutes", 0))
+
+    end_dt += timedelta(minutes=extra_after)
 
     return start_dt <= now <= end_dt
 
