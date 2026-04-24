@@ -30,9 +30,22 @@ def write_schedule(data: dict):
 # --- Override ---
 
 def read_override() -> dict:
-    with open(OVERRIDE_PATH, 'r') as f:
-        return json.load(f)
+    try:
+        with open(OVERRIDE_PATH, 'r') as f:
+            data = json.load(f)
+            return {
+                "web":      data.get("web", None),
+                "physical": data.get("physical", None)
+            }
+    except:
+        return {"web": None, "physical": None}
 
 def write_override(state):
+    try:
+        with open(OVERRIDE_PATH, 'r') as f:
+            data = json.load(f)
+    except:
+        data = {"web": None, "physical": None}
+    data["web"] = state
     with open(OVERRIDE_PATH, 'w') as f:
-        json.dump({"state": state}, f, indent=4)
+        json.dump(data, f, indent=4)

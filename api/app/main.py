@@ -11,7 +11,6 @@ import config_manager
 
 app = FastAPI(title="DeepPool API")
 
-# CORS — sera restreint à l'URL du site React en prod
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -26,7 +25,7 @@ class ConfigUpdate(BaseModel):
     temp_off: Optional[float] = None
 
 class OverrideUpdate(BaseModel):
-    state: Optional[bool] = None  # True=ON, False=OFF, None=auto
+    state: Optional[bool] = None
 
 class ScheduleUpdate(BaseModel):
     schedule: list
@@ -38,7 +37,6 @@ def login(form: OAuth2PasswordRequestForm = Depends()):
     if form.username != os.environ["API_USERNAME"] or \
        form.password != os.environ["API_PASSWORD"]:
         raise HTTPException(status_code=401, detail="Identifiants incorrects")
-
     token = auth.create_token({"sub": form.username})
     return {"access_token": token, "token_type": "bearer"}
 
@@ -50,10 +48,21 @@ def get_status(user: str = Depends(auth.get_current_user)):
     pump_state = influx.get_latest_pump_state()
     override   = config_manager.read_override()
 
+    physical = override["physical"]
+    web      = override["web"]
+
+    if physical is not None:
+        mode = "physique_on" if physical else "physique_off"
+    elif web is not None:
+        mode = "override_on" if web else "override_off"
+    else:
+        mode = "auto"
+
     return {
         "temperature": temp,
         "pump":        pump_state,
-        "override":    override["state"],
+        "override":    web,
+        "mode":        mode,
     }
 
 # --- Température ---

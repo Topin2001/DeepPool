@@ -1,18 +1,22 @@
 import { useQuery } from '@tanstack/react-query'
 import { getStatus } from '../api/client'
 
+const modeLabels = {
+  physique_on:  '🔘 Physique — Marche',
+  physique_off: '🔘 Physique — Arrêt',
+  override_on:  '🌐 Web — Marche forcée',
+  override_off: '🌐 Web — Arrêt forcé',
+  auto:         '⚙️ Automatique',
+}
+
 export default function StatusBanner() {
   const { data, isLoading } = useQuery({
     queryKey: ['status'],
     queryFn: getStatus,
   })
 
-  const pumpOn = data?.pump
-  const override = data?.override
-
-  let modeLabel = 'Auto'
-  if (override === true)  modeLabel = 'Forcé ON'
-  if (override === false) modeLabel = 'Forcé OFF'
+  const pumpOn    = data?.pump
+  const modeLabel = isLoading ? '...' : (modeLabels[data?.mode] || '⚙️ Automatique')
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -30,7 +34,7 @@ export default function StatusBanner() {
       />
       <Card
         label="Mode"
-        value={isLoading ? '...' : modeLabel}
+        value={modeLabel}
         icon="⚙️"
         color="purple"
       />
