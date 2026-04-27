@@ -25,6 +25,7 @@ export default function ScheduleEditor() {
     mutationFn: updateSchedule,
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['schedule'] })
+      qc.invalidateQueries({ queryKey: ['scheduleToday'] })
       setSuccess(true)
       setTimeout(() => setSuccess(false), 2000)
     }
@@ -36,6 +37,15 @@ export default function ScheduleEditor() {
   const updateSlot = (i, field, value) => {
     const updated = [...slots]
     updated[i] = { ...updated[i], [field]: value }
+    setSlots(updated)
+  }
+
+  const toggleMinTemp = (i) => {
+    const updated = [...slots]
+    updated[i] = {
+      ...updated[i],
+      min_temp: updated[i].min_temp !== null ? null : 25.0
+    }
     setSlots(updated)
   }
 
@@ -107,16 +117,30 @@ export default function ScheduleEditor() {
 
               {/* Température minimale d'activation */}
               <div className="flex items-center gap-3">
-                <span className="text-sm text-gray-500 dark:text-gray-400">Activer seulement si temp &gt;</span>
-                <input
-                  type="number"
-                  step="0.5"
-                  placeholder="—"
-                  value={slot.min_temp ?? ''}
-                  onChange={e => updateSlot(i, 'min_temp', e.target.value === '' ? null : parseFloat(e.target.value))}
-                  className="w-20 px-2 py-1 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-600 text-sm focus:outline-none focus:ring-2 focus:ring-pool-500"
-                />
-                <span className="text-sm text-gray-500 dark:text-gray-400">°C (vide = toujours)</span>
+                <button
+                  onClick={() => toggleMinTemp(i)}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                    slot.min_temp !== null
+                      ? 'bg-orange-500 text-white hover:bg-orange-600'
+                      : 'bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500'
+                  }`}
+                >
+                  🌡️ {slot.min_temp !== null ? 'Condition temp. active' : 'Condition temp. inactive'}
+                </button>
+
+                {slot.min_temp !== null && (
+                  <>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">si temp. moy. J-1 &gt;</span>
+                    <input
+                      type="number"
+                      step="0.5"
+                      value={slot.min_temp}
+                      onChange={e => updateSlot(i, 'min_temp', parseFloat(e.target.value))}
+                      className="w-20 px-2 py-1 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-600 text-sm focus:outline-none focus:ring-2 focus:ring-pool-500"
+                    />
+                    <span className="text-sm text-gray-500 dark:text-gray-400">°C</span>
+                  </>
+                )}
               </div>
 
               {/* Extensions */}
@@ -136,7 +160,7 @@ export default function ScheduleEditor() {
                 ) : (
                   slot.extensions.map((ext, j) => (
                     <div key={j} className="flex items-center gap-2 flex-wrap bg-white dark:bg-gray-600 rounded-lg px-3 py-2">
-                      <span className="text-xs text-gray-500 dark:text-gray-400">Si temp &gt;</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">Si temp. moy. J-1 &gt;</span>
                       <input
                         type="number"
                         step="0.5"
@@ -156,7 +180,6 @@ export default function ScheduleEditor() {
                       <button
                         onClick={() => removeExtension(i, j)}
                         className="ml-auto text-red-400 hover:text-red-600 transition-colors"
-                        title="Supprimer"
                       >
                         ×
                       </button>
