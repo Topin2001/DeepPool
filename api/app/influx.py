@@ -57,3 +57,18 @@ def get_temperature_history() -> list:
                     "value": round(record.get_value(), 2)
                 })
     return results
+
+def get_avg_temp_yesterday() -> float | None:
+    query = '''
+        from(bucket: "{bucket}")
+          |> range(start: -48h, stop: -24h)
+          |> filter(fn: (r) => r._measurement == "temperature_eau" and r._field == "value")
+          |> mean()
+    '''.format(bucket=os.environ["INFLUXDB_BUCKET"])
+
+    with _client() as c:
+        tables = c.query_api().query(query)
+        for table in tables:
+            for record in table.records:
+                return round(record.get_value(), 2)
+    return None

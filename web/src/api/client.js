@@ -33,6 +33,7 @@ export const getStatus     = () => client.get('/status').then(r => r.data)
 export const getTemperature = () => client.get('/temperature').then(r => r.data)
 export const getConfig     = () => client.get('/config').then(r => r.data)
 export const getSchedule   = () => client.get('/schedule').then(r => r.data)
+export const getScheduleToday = () => client.get('/schedule/today').then(r => r.data)
 export const getOverride   = () => client.get('/override').then(r => r.data)
 
 export const updateConfig   = (data) => client.put('/config', data).then(r => r.data)

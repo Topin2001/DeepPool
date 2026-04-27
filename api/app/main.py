@@ -113,3 +113,13 @@ def get_schedule(user: str = Depends(auth.get_current_user)):
 def update_schedule(body: ScheduleUpdate, user: str = Depends(auth.get_current_user)):
     config_manager.write_schedule({"schedule": body.schedule})
     return {"message": "Planning mis à jour", "schedule": body.schedule}
+
+@app.get("/schedule/today")
+def get_schedule_today(user: str = Depends(auth.get_current_user)):
+    from scheduler_helper import compute_today_slots
+    avg_temp = influx.get_avg_temp_yesterday()
+    slots    = compute_today_slots(avg_temp)
+    return {
+        "avg_temp_yesterday": avg_temp,
+        "planned_slots":      slots,
+    }
