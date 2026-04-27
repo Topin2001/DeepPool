@@ -67,14 +67,13 @@ def get_temperature_history(hours: int = 24) -> list:
     return results
 
 def get_pump_history(hours: int = 24) -> list:
-    every = "30s" if hours <= 12 else "1m" if hours <= 24 else "5m" if hours <= 72 else "15m"
+    every = "1m" if hours <= 24 else "5m" if hours <= 72 else "15m"
 
     query = '''
         from(bucket: "{bucket}")
           |> range(start: -{hours}h)
           |> filter(fn: (r) => r._measurement == "etat_pompe" and r._field == "value")
           |> aggregateWindow(every: {every}, fn: max, createEmpty: true)
-          |> toFloat()
           |> fill(value: 0.0)
     '''.format(bucket=os.environ["INFLUXDB_BUCKET"], hours=hours, every=every)
 
