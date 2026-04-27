@@ -9,8 +9,12 @@ def get_avg_temp_yesterday() -> float | None:
             org=os.environ["INFLUXDB_ORG"]
         )
         query = '''
+            import "date"
             from(bucket: "{bucket}")
-              |> range(start: -48h, stop: -24h)
+              |> range(
+                  start: date.truncate(t: now(), unit: 1d) - 1d,
+                  stop: date.truncate(t: now(), unit: 1d)
+              )
               |> filter(fn: (r) => r._measurement == "temperature_eau" and r._field == "value")
               |> mean()
         '''.format(bucket=os.environ["INFLUXDB_BUCKET"])
