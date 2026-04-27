@@ -67,7 +67,7 @@ def get_temperature_history(hours: int = 24) -> list:
     return results
 
 def get_pump_history(hours: int = 24) -> list:
-    every = "1m" if hours <= 24 else "5m" if hours <= 72 else "15m"
+    every = "30s" if hours <= 12 else "1m" if hours <= 24 else "5m" if hours <= 72 else "15m"
 
     query = '''
         from(bucket: "{bucket}")
