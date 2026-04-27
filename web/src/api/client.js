@@ -29,13 +29,14 @@ export const login = async (username, password) => {
   localStorage.setItem('token', res.data.access_token)
 }
 
-export const getStatus     = () => client.get('/status').then(r => r.data)
-export const getTemperature = () => client.get('/temperature').then(r => r.data)
-export const getConfig     = () => client.get('/config').then(r => r.data)
-export const getSchedule   = () => client.get('/schedule').then(r => r.data)
+export const getStatus        = () => client.get('/status').then(r => r.data)
+export const getTemperature   = (hours = 24) => client.get('/temperature', { params: { hours } }).then(r => r.data)
+export const getPumpHistory   = (hours = 24) => client.get('/pump/history', { params: { hours } }).then(r => r.data)
+export const getConfig        = () => client.get('/config').then(r => r.data)
+export const getSchedule      = () => client.get('/schedule').then(r => r.data)
 export const getScheduleToday = () => client.get('/schedule/today').then(r => r.data)
-export const getOverride   = () => client.get('/override').then(r => r.data)
+export const getOverride      = () => client.get('/override').then(r => r.data)
 
-export const updateConfig   = (data) => client.put('/config', data).then(r => r.data)
-export const updateOverride = (state) => client.put('/override', { state }).then(r => r.data)
+export const updateConfig   = (data)     => client.put('/config', data).then(r => r.data)
+export const updateOverride = (state)    => client.put('/override', { state }).then(r => r.data)
 export const updateSchedule = (schedule) => client.put('/schedule', { schedule }).then(r => r.data)

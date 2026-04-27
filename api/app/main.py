@@ -18,6 +18,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+VALID_HOURS = {6, 12, 24, 48, 72, 168}
+
 # --- Modèles ---
 
 class ConfigUpdate(BaseModel):
@@ -68,8 +70,16 @@ def get_status(user: str = Depends(auth.get_current_user)):
 # --- Température ---
 
 @app.get("/temperature")
-def get_temperature(user: str = Depends(auth.get_current_user)):
-    return {"data": influx.get_temperature_history()}
+def get_temperature(hours: int = 24, user: str = Depends(auth.get_current_user)):
+    if hours not in VALID_HOURS:
+        raise HTTPException(status_code=400, detail="Valeur hours invalide (6/12/24/48/72/168)")
+    return {"data": influx.get_temperature_history(hours)}
+
+@app.get("/pump/history")
+def get_pump_history(hours: int = 24, user: str = Depends(auth.get_current_user)):
+    if hours not in VALID_HOURS:
+        raise HTTPException(status_code=400, detail="Valeur hours invalide (6/12/24/48/72/168)")
+    return {"data": influx.get_pump_history(hours)}
 
 # --- Config ---
 
