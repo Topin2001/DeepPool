@@ -1,30 +1,27 @@
 import os
+from datetime import datetime, timedelta
 from influxdb_client import InfluxDBClient
 
 def get_avg_temp_yesterday() -> float | None:
     try:
+        today     = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        yesterday = today - timedelta(days=1)
+
         client = InfluxDBClient(
             url=os.environ["INFLUXDB_URL"],
             token=os.environ["INFLUXDB_TOKEN"],
             org=os.environ["INFLUXDB_ORG"]
         )
         query = '''
-            import "date"
-            import "timezone"
-
-            option location = timezone.location(name: "Europe/Paris")
-            
-            yesterdayStart = date.truncate(t: now(), unit: 1d) - 1d
-            todayStart = date.truncate(t: now(), unit: 1d)
-            
             from(bucket: "{bucket}")
-              |> range(
-                  start: yesterdayStart,
-                  stop: todayStart
-              )
+              |> range(start: {start}, stop: {stop})
               |> filter(fn: (r) => r._measurement == "temperature_eau" and r._field == "value")
               |> mean()
-        '''.format(bucket=os.environ["INFLUXDB_BUCKET"])
+        '''.format(
+            bucket=os.environ["INFLUXDB_BUCKET"],
+            start=yesterday.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            stop=today.strftime("%Y-%m-%dT%H:%M:%SZ")
+        )
 
         tables = client.query_api().query(query)
         for table in tables:
