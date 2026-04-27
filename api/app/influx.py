@@ -74,6 +74,7 @@ def get_pump_history(hours: int = 24) -> list:
           |> range(start: -{hours}h)
           |> filter(fn: (r) => r._measurement == "etat_pompe" and r._field == "value")
           |> aggregateWindow(every: {every}, fn: max, createEmpty: true)
+          |> toFloat()
           |> fill(value: 0.0)
     '''.format(bucket=os.environ["INFLUXDB_BUCKET"], hours=hours, every=every)
 
