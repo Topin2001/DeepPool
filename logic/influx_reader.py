@@ -9,14 +9,17 @@ def get_avg_temp_yesterday() -> float | None:
             org=os.environ["INFLUXDB_ORG"]
         )
         query = '''
-            import "date"
+            import "timezone"
+            option location = timezone.location(name: "Europe/Paris")
             from(bucket: "{bucket}")
-              |> range(
-                  start: date.truncate(t: now(), unit: 1d) - 1d,
-                  stop: date.truncate(t: now(), unit: 1d)
-              )
+              |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
               |> filter(fn: (r) => r._measurement == "temperature_eau" and r._field == "value")
-              |> mean()
+              |> aggregateWindow(
+                  every: 1d,
+                  fn: mean,
+                  createEmpty: false,
+                  offset: 0h
+              )
         '''.format(bucket=os.environ["INFLUXDB_BUCKET"])
 
         tables = client.query_api().query(query)
