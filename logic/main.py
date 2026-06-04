@@ -26,52 +26,66 @@ signal.signal(signal.SIGINT, handle_shutdown)
 # --- Setup ---
 pump_control.setup()
 db_client.connect()
+cfg = config.load()
 
 print("🚀 DeepPool starting...")
 
+FAST_INTERVAL = cfg.get("fast_interval_seconds", 5)
+SLOW_INTERVAL = cfg.get("loop_interval_seconds", 60)
+
+last_slow = 0
+last_temp = None  # dernière température connue
+
 try:
     while True:
-        cfg  = config.load()
-        temp = temp_sensor.read_temp()
+        now = time.time()
+        cfg = config.load()
 
-        if temp is not None:
-            physical  = switch_reader.read_manual()
-            scheduled = scheduler.schedule_wants_pump(temp)
+        # --- Boucle rapide : contrôle pompe ---
+        physical  = switch_reader.read_manual()
+        scheduled = scheduler.schedule_wants_pump(last_temp or 0.0)
 
-            # Lire et mettre à jour l'état physique dans override.json
-            override_data = override_reader.read_override()
-            override_data["physical"] = physical
-            try:
-                with open(OVERRIDE_PATH, 'w') as f:
-                    json.dump(override_data, f, indent=4)
-            except Exception as e:
-                print(f"[WARN] Could not write physical state: {e}")
+        # Mettre à jour l'état physique dans override.json
+        override_data = override_reader.read_override()
+        override_data["physical"] = physical
+        try:
+            with open(OVERRIDE_PATH, 'w') as f:
+                json.dump(override_data, f, indent=4)
+        except Exception as e:
+            print(f"[WARN] Could not write physical state: {e}")
 
-            web_over = override_data.get("web", None)
+        web_over = override_data.get("web", None)
 
-            pump_state = controller.resolve_pump_state(
-                temp=temp,
-                physical_request=physical,
-                web_override=web_over,
-                schedule_request=scheduled,
-            )
+        pump_state = controller.resolve_pump_state(
+            temp=last_temp or 0.0,
+            physical_request=physical,
+            web_override=web_over,
+            schedule_request=scheduled,
+        )
+        pump_control.set_pump(pump_state)
 
-            pump_control.set_pump(pump_state)
-            db_client.write(temp, pump_state)
+        # --- Boucle lente : température + BDD ---
+        if now - last_slow >= SLOW_INTERVAL:
+            temp = temp_sensor.read_temp()
+            if temp is not None:
+                last_temp = temp
+                db_client.write(temp, pump_state)
 
-            if physical is not None:
-                mode = f"physique {'ON' if physical else 'OFF'}"
-            elif web_over is not None:
-                mode = f"override web {'ON' if web_over else 'OFF'}"
-            elif scheduled is not None:
-                mode = "planning"
-            else:
-                mode = "auto temp"
+                if physical is not None:
+                    mode = f"physique {'ON' if physical else 'OFF'}"
+                elif web_over is not None:
+                    mode = f"override web {'ON' if web_over else 'OFF'}"
+                elif scheduled is not None:
+                    mode = "planning"
+                else:
+                    mode = "auto temp"
 
-            print(f"[{time.strftime('%H:%M:%S')}] {temp:.1f}°C — pompe {'ON' if pump_state else 'OFF'} ({mode})")
+                print(f"[{time.strftime('%H:%M:%S')}] {temp:.1f}°C — pompe {'ON' if pump_state else 'OFF'} ({mode})")
+
+            last_slow = now
 
         sys.stdout.flush()
-        time.sleep(cfg["loop_interval_seconds"])
+        time.sleep(FAST_INTERVAL)
 
 except KeyboardInterrupt:
     pass
