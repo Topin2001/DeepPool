@@ -9,6 +9,7 @@ _DEFAULTS = {
     "gpio_pin_pump": 17,
     "gpio_pin_sw_on": 23,
     "gpio_pin_sw_off": 24,
+    "fast_interval_seconds": 5,
     "loop_interval_seconds": 60
 }
 
