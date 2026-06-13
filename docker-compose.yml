@@ -104,7 +104,6 @@ services:
       - DOMAIN=${DOMAIN}
     volumes:
       - ./nginx/templates:/etc/nginx/templates
-      - ./certs:/etc/nginx/certs:ro
     command: ["/bin/sh", "-c", "envsubst '$$DOMAIN' < /etc/nginx/templates/default.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"]
     restart: unless-stopped
     depends_on:
