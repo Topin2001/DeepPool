@@ -1,0 +1,88 @@
+<svg width="900" height="620" viewBox="0 0 900 620" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrowg" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M1 1L9 5L1 9" fill="none" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <rect width="900" height="620" fill="#0f172a"/>
+
+  <text x="450" y="36" text-anchor="middle" fill="#f1f5f9" font-size="20" font-weight="700">DeepPool — Câblage Raspberry Pi (GPIO BCM)</text>
+  <text x="450" y="58" text-anchor="middle" fill="#64748b" font-size="12">Capteur DS18B20 · Relais pompe · 2 interrupteurs manuels</text>
+
+  <!-- Raspberry Pi central block -->
+  <rect x="370" y="100" width="160" height="420" rx="14" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+  <text x="450" y="130" text-anchor="middle" fill="#e2e8f0" font-size="14" font-weight="700">Raspberry Pi</text>
+  <text x="450" y="148" text-anchor="middle" fill="#64748b" font-size="11">GPIO (numérotation BCM)</text>
+
+  <!-- Pi pin labels -->
+  <g fill="#94a3b8" font-size="12">
+    <text x="450" y="190" text-anchor="middle">3.3V — GPIO4 (1-Wire)</text>
+    <text x="450" y="230" text-anchor="middle">GND</text>
+    <text x="450" y="290" text-anchor="middle">GPIO17 — Relais pompe</text>
+    <text x="450" y="350" text-anchor="middle">3.3V — GND</text>
+    <text x="450" y="410" text-anchor="middle">GPIO23 — Marche forcée</text>
+    <text x="450" y="470" text-anchor="middle">GPIO24 — Arrêt forcé</text>
+  </g>
+
+  <!-- === DS18B20 sensor (left, top) === -->
+  <g>
+    <rect x="60" y="100" width="200" height="90" rx="10" fill="#0ea5e9" opacity="0.12" stroke="#38bdf8" stroke-width="1.5"/>
+    <text x="160" y="128" text-anchor="middle" fill="#bae6fd" font-size="14" font-weight="700">Capteur DS18B20</text>
+    <text x="160" y="148" text-anchor="middle" fill="#7dd3fc" font-size="11">+ résistance pull-up 4.7kΩ</text>
+    <text x="160" y="166" text-anchor="middle" fill="#7dd3fc" font-size="11">entre data et 3.3V</text>
+  </g>
+  <line x1="260" y1="125" x2="370" y2="125" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrowg)"/>
+  <text x="315" y="118" text-anchor="middle" fill="#7dd3fc" font-size="10">VDD/Data → GPIO4</text>
+  <line x1="260" y1="160" x2="370" y2="160" stroke="#64748b" stroke-width="2" stroke-dasharray="4 3"/>
+  <text x="315" y="178" text-anchor="middle" fill="#94a3b8" font-size="10">GND</text>
+
+  <!-- === Relay / LED (left, middle) === -->
+  <g>
+    <rect x="60" y="230" width="200" height="100" rx="10" fill="#22c55e" opacity="0.12" stroke="#4ade80" stroke-width="1.5"/>
+    <text x="160" y="258" text-anchor="middle" fill="#bbf7d0" font-size="14" font-weight="700">Relais pompe</text>
+    <text x="160" y="278" text-anchor="middle" fill="#86efac" font-size="11">(LED + résistance 330Ω</text>
+    <text x="160" y="294" text-anchor="middle" fill="#86efac" font-size="11">pour les tests)</text>
+  </g>
+  <line x1="260" y1="265" x2="370" y2="265" stroke="#4ade80" stroke-width="2" marker-end="url(#arrowg)"/>
+  <text x="315" y="258" text-anchor="middle" fill="#86efac" font-size="10">IN → GPIO17</text>
+  <line x1="260" y1="300" x2="370" y2="300" stroke="#64748b" stroke-width="2" stroke-dasharray="4 3"/>
+  <text x="315" y="318" text-anchor="middle" fill="#94a3b8" font-size="10">GND / 3.3V (selon module)</text>
+
+  <!-- === Switch ON (right, top) === -->
+  <g>
+    <rect x="640" y="230" width="200" height="100" rx="10" fill="#facc15" opacity="0.12" stroke="#fde047" stroke-width="1.5"/>
+    <text x="740" y="258" text-anchor="middle" fill="#fef9c3" font-size="14" font-weight="700">Interrupteur</text>
+    <text x="740" y="278" text-anchor="middle" fill="#fef08a" font-size="11">« Marche forcée »</text>
+    <text x="740" y="294" text-anchor="middle" fill="#fef08a" font-size="11">+ pull-down 10kΩ</text>
+  </g>
+  <line x1="640" y1="265" x2="530" y2="265" stroke="#fde047" stroke-width="2" marker-end="url(#arrowg)"/>
+  <text x="585" y="258" text-anchor="middle" fill="#fef08a" font-size="10">→ GPIO23</text>
+  <line x1="640" y1="300" x2="530" y2="300" stroke="#64748b" stroke-width="2" stroke-dasharray="4 3"/>
+  <text x="585" y="318" text-anchor="middle" fill="#94a3b8" font-size="10">3.3V via interrupteur</text>
+
+  <!-- === Switch OFF (right, bottom) === -->
+  <g>
+    <rect x="640" y="380" width="200" height="100" rx="10" fill="#f97316" opacity="0.12" stroke="#fb923c" stroke-width="1.5"/>
+    <text x="740" y="408" text-anchor="middle" fill="#fed7aa" font-size="14" font-weight="700">Interrupteur</text>
+    <text x="740" y="428" text-anchor="middle" fill="#fdba74" font-size="11">« Arrêt forcé »</text>
+    <text x="740" y="444" text-anchor="middle" fill="#fdba74" font-size="11">+ pull-down 10kΩ</text>
+  </g>
+  <line x1="640" y1="415" x2="530" y2="415" stroke="#fb923c" stroke-width="2" marker-end="url(#arrowg)"/>
+  <text x="585" y="408" text-anchor="middle" fill="#fdba74" font-size="10">→ GPIO24</text>
+  <line x1="640" y1="450" x2="530" y2="450" stroke="#64748b" stroke-width="2" stroke-dasharray="4 3"/>
+  <text x="585" y="468" text-anchor="middle" fill="#94a3b8" font-size="10">3.3V via interrupteur</text>
+
+  <!-- Legend -->
+  <g font-size="11" fill="#94a3b8">
+    <line x1="280" y1="560" x2="320" y2="560" stroke="#38bdf8" stroke-width="2"/>
+    <text x="330" y="564">Signal / data</text>
+
+    <line x1="450" y1="560" x2="490" y2="560" stroke="#64748b" stroke-width="2" stroke-dasharray="4 3"/>
+    <text x="500" y="564">Alimentation / masse</text>
+  </g>
+
+  <text x="450" y="600" text-anchor="middle" fill="#475569" font-size="11">
+    Les broches sont configurables dans config.json (gpio_pin_pump, gpio_pin_sw_on, gpio_pin_sw_off)
+  </text>
+</svg>
