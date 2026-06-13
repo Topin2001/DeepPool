@@ -93,21 +93,23 @@ services:
     depends_on:
       - api
 
-  # --- REVERSE PROXY ---
+# --- REVERSE PROXY ---
   nginx:
-    image: nginx:latest
+    image: nginx:alpine
     container_name: deeppool-nginx
     ports:
       - "80:80"
       - "443:443"
+    environment:
+      - DOMAIN=${DOMAIN}
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-    restart: always
-    networks:
-      - internal
+      - ./nginx/templates:/etc/nginx/templates
+      - ./certs:/etc/nginx/certs:ro
+    command: ["/bin/sh", "-c", "envsubst '$$DOMAIN' < /etc/nginx/templates/default.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"]
+    restart: unless-stopped
     depends_on:
-      - web
       - api
+      - web
       - grafana
 
   # --- MISES À JOUR ---
