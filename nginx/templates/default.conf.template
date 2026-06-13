@@ -4,19 +4,6 @@ server {
     listen 80;
     server_name ${DOMAIN};
 
-    # Redirection vers HTTPS
-    location / {
-        return 301 https://$host$request_uri;
-    }
-}
-
-server {
-    listen 443 ssl;
-    server_name ${DOMAIN};
-
-    ssl_certificate     /etc/nginx/certs/fullchain.pem;
-    ssl_certificate_key /etc/nginx/certs/privkey.pem;
-
     location / {
         set $upstream_web http://web:80;
         proxy_pass $upstream_web;
