@@ -14,8 +14,8 @@ server {
     }
 
     location /api/ {
-        rewrite ^/api/(.*)$ /$1 break;
         set $upstream_api http://api:8000;
+        rewrite ^/api/(.*)$ /$1 break;
         proxy_pass $upstream_api;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -24,8 +24,8 @@ server {
     }
 
     location /grafana/ {
-        rewrite ^/grafana/(.*)$ /$1 break;
         set $upstream_grafana http://grafana:3000;
+        rewrite ^/grafana/(.*)$ /$1 break;
         proxy_pass $upstream_grafana;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
