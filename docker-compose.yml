@@ -59,6 +59,9 @@ services:
       - GF_SERVER_ROOT_URL=https://${DOMAIN}/grafana/
       - GF_SERVER_SERVE_FROM_SUB_PATH=true
       - GF_SECURITY_CSRF_TRUSTED_ORIGINS=${DOMAIN}
+      - GF_SECURITY_ALLOW_EMBEDDING=true
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
     restart: always
     networks:
       - internal
