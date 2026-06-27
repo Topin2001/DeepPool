@@ -8,10 +8,10 @@ const TIME_RANGES = [
 ]
 
 export default function TemperatureChart({ theme }) {
-  const [range, setRange] = useState('now-2d')
+  const [range, setRange] = useState('now-24h')
 
   const grafanaTheme = theme === 'dark' ? 'dark' : 'light'
-  const src = `/grafana/d/adm5m65/suivi-piscine?orgId=1&from=${range}&to=now&timezone=browser&refresh=30s&kiosk=tv&theme=${grafanaTheme}`
+  const src = `/grafana/d-solo/adm5m65/suivi-piscine?orgId=1&panelId=panel-1&from=${range}&to=now&timezone=browser&refresh=30s&theme=${grafanaTheme}`
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
@@ -36,7 +36,7 @@ export default function TemperatureChart({ theme }) {
         </div>
       </div>
       <iframe
-        key={grafanaTheme}
+        key={`${grafanaTheme}-${range}`}
         src={src}
         width="100%"
         height="400"
