@@ -1,14 +1,15 @@
 import { useState } from 'react'
 
 const TIME_RANGES = [
-  { label: '6h',  value: 'now-6h'  },
+  { label: '12h',  value: 'now-12h'  },
   { label: '24h', value: 'now-24h' },
   { label: '2j',  value: 'now-2d'  },
+  { label: '3j',  value: 'now-3d'  },
   { label: '7j',  value: 'now-7d'  },
 ]
 
 export default function TemperatureChart({ theme }) {
-  const [range, setRange] = useState('now-24h')
+  const [range, setRange] = useState('now-2d')
 
   const grafanaTheme = theme === 'dark' ? 'dark' : 'light'
   const src = `/grafana/d-solo/adm5m65/suivi-piscine?orgId=1&panelId=panel-1&from=${range}&to=now&timezone=browser&refresh=30s&theme=${grafanaTheme}`
